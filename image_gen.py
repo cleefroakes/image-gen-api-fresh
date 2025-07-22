@@ -8,6 +8,7 @@ pipe = None
 def load_model():
     global pipe
     if pipe is None:
+        move_cache()  # Moved to delay cache migration
         try:
             if importlib.util.find_spec("accelerate") is None:
                 print("Warning: accelerate not found, using default loading")
