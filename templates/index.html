@@ -2,6 +2,13 @@
 <html>
 <head>
     <title>Image Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        form { max-width: 500px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; background: #007BFF; color: white; border: none; }
+        #result { margin-top: 20px; }
+    </style>
 </head>
 <body>
     <h1>Generate an Image</h1>
@@ -23,7 +30,7 @@
             const data = await response.json();
             if (data.image) {
                 const img = new Image();
-                img.src = 'data:image/png;base64,' + btoa(data.image);
+                img.src = 'data:image/png;base64,' + data.image;
                 document.getElementById('result').innerHTML = '';
                 document.getElementById('result').appendChild(img);
             } else {
@@ -33,10 +40,3 @@
     </script>
 </body>
 </html>
-<style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    form { max-width: 500px; }
-    input { width: 100%; padding: 10px; margin: 10px 0; }
-    button { padding: 10px 20px; background: #007BFF; color: white; border: none; }
-    #result { margin-top: 20px; }
-</style>
