@@ -2,16 +2,20 @@ from diffusers import StableDiffusionPipeline
 import torch
 from transformers.utils import move_cache
 import importlib.util
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 pipe = None
 
 def load_model():
     global pipe
     if pipe is None:
-        move_cache()  # Moved to delay cache migration
         try:
+            move_cache()
             if importlib.util.find_spec("accelerate") is None:
-                print("Warning: accelerate not found, using default loading")
+                logger.warning("accelerate not found, using default loading")
                 pipe = StableDiffusionPipeline.from_pretrained(
                     "runwayml/stable-diffusion-v1-5",
                     torch_dtype=torch.float16,
@@ -34,21 +38,25 @@ def load_model():
             pipe.enable_sequential_cpu_offload()
             pipe.enable_attention_slicing()
         except Exception as e:
-            print(f"Error loading model: {e}")
+            logger.error(f"Failed to load model: {e}")
             raise
     return pipe
 
 def generate_image(prompt: str):
     if pipe is None:
         load_model()
-    image = pipe(
-        prompt,
-        num_inference_steps=5,
-        height=32,
-        width=32,
-        guidance_scale=7.5
-    ).images[0]
-    return image
+    try:
+        image = pipe(
+            prompt,
+            num_inference_steps=5,
+            height=32,
+            width=32,
+            guidance_scale=7.5
+        ).images[0]
+        return image
+    except Exception as e:
+        logger.error(f"Image generation failed: {e}")
+        raise
 
 if __name__ == "__main__":
     image = generate_image("A futuristic city")
