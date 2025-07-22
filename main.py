@@ -1,19 +1,23 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from image_gen import generate_image
 from fastapi.templating import Jinja2Templates
+from image_gen import generate_image
+from fastapi import Form
+from pydantic import BaseModel
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+
+class ImageRequest(BaseModel):
+    prompt: str
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/generate-image/")
-async def create_image(prompt: str):
+async def create_image(prompt: str = Form(...)):
     image = generate_image(prompt)
-    # Convert image to bytes for response (adjust based on image type)
     import io
     from PIL import Image
     img_byte_arr = io.BytesIO()
@@ -23,5 +27,4 @@ async def create_image(prompt: str):
 
 @app.get("/image")
 async def get_image():
-    # This is a placeholder; you'd need to store the last generated image or handle state
     return {"message": "Image generation requires a POST to /generate-image/"}

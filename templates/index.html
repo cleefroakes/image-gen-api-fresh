@@ -10,17 +10,15 @@
         <input type="text" id="prompt" name="prompt" required><br><br>
         <button type="submit">Generate Image</button>
     </form>
-    <div id="result">
-        <!-- Image will be displayed here if implemented with JavaScript -->
-    </div>
+    <div id="result"></div>
     <script>
         document.querySelector('form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const prompt = document.getElementById('prompt').value;
             const response = await fetch('/generate-image/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `prompt=${encodeURIComponent(prompt)}`
             });
             const data = await response.json();
             if (data.image) {
@@ -28,6 +26,8 @@
                 img.src = 'data:image/png;base64,' + btoa(data.image);
                 document.getElementById('result').innerHTML = '';
                 document.getElementById('result').appendChild(img);
+            } else {
+                document.getElementById('result').textContent = 'Error: ' + JSON.stringify(data);
             }
         });
     </script>
