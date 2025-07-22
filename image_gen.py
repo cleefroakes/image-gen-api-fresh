@@ -3,9 +3,6 @@ import torch
 from transformers.utils import move_cache
 import importlib.util
 
-# Move cache (run once)
-move_cache()
-
 pipe = None
 
 def load_model():
